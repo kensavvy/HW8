@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   ADD YOUR NAME / SECTION NUMBER HERE
+ *   Kendall Savino / COMP 272 002
  *
  *   This java file contains the problem solutions of canFinish and
  *   numGroups methods.
@@ -72,20 +72,80 @@ class ProblemSolutions {
      * @return boolean          - True if all exams can be taken, else false.
      */
 
-    public boolean canFinish(int numExams, 
-                             int[][] prerequisites) {
+    public boolean canFinish(int numExams, int[][] prerequisites) {
       
         int numNodes = numExams;  // # of nodes in graph
 
         // Build directed graph's adjacency list
-        ArrayList<Integer>[] adj = getAdjList(numExams, 
-                                        prerequisites); 
+        ArrayList<Integer>[] adj = getAdjList(numExams, prerequisites); 
 
         // ADD YOUR CODE HERE - ADD YOUR NAME / SECTION AT TOP OF FILE
-        return false;
+
+        // Initialize boolean array to track visited nodes, avoiiding duplication
+        boolean[] isVisited = new boolean[numNodes];
+
+        // Initialize boolean array to track nodes currently in rescursion stack
+        boolean[] isInStack = new boolean [numExams];
+
+        // Initialize boolean variable assuming graph has a cycle
+        boolean isNotCycle = false;
+
+        // Loop through exams
+        for (int node = 0; node < numExams; node++) {
+
+            // If an exam has not been visited yet, run a DFS
+            if (!isVisited[node]) {
+
+                // Call helper method to find if cycle is found, return false if it is
+                if (hasCycleDFS(node, adj, isVisited, isInStack)) {
+                    return isNotCycle;
+                }
+            }
+        }
+
+        // If loop completes without finding a cycle, update boolean to true
+        isNotCycle = true;
+
+        // Return true if all exams can be taken, false is a cycle is found
+        return isNotCycle;
 
     }
 
+    private boolean hasCycleDFS(int node, ArrayList<Integer>[] adj, boolean[] isVisited,
+                                boolean[] isInStack) {
+
+        // Make sure current node has been visited
+        isVisited[node] = true;
+
+        // Make sure current node is in recursion stack
+        isInStack[node] = true;
+
+        // Initialize boolean variable to track if graph has a cycle, assuming there isn't one
+        boolean hasCycle = false;
+
+        // Loop through all adjacent nodes (exams that depend on current exam)
+        for (int adjacent : adj[node]) {
+
+            // If the adjacent hasn't been visited yet
+            if (!isVisited[adjacent]) {
+
+                // If recursive call finds a cycle, update boolean to true
+                if (hasCycleDFS(adjacent, adj, isVisited, isInStack)) {
+                    hasCycle = true;
+                }
+
+            // If the adjacent has been visited and it is in the stack, cycle is found
+            } else if (isInStack[adjacent]) {
+                hasCycle = true;
+            }
+        }
+
+        // Remove node from stack once all adjacent nodes have been visited without finding cycle
+        isInStack[node] = false;
+
+        // Return true if there's a cycle, false if there is no cycle
+        return hasCycle;
+    }
 
     /**
      * Method getAdjList
