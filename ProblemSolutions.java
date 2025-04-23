@@ -234,7 +234,7 @@ class ProblemSolutions {
          * sample code illustrates a technique to do so.
          */
 
-        for(i = 0; i < numNodes ; i++){
+        for(i = 0; i < numNodes ; i++) {
             for(j = 0; j < numNodes; j++){
                 if( adjMatrix[i][j] == 1 && i != j ){
                     // Add AdjList for node i if not there
@@ -252,7 +252,39 @@ class ProblemSolutions {
 
         // YOUR CODE GOES HERE - you can add helper methods, you do not need
         // to put all code in this method.
-        return -1;
+
+        // Initialize boolean array to track visited nodes, avoiiding duplication
+        boolean[] isVisited = new boolean[numNodes];
+
+        // Initialize tracker to count the number of groups
+        int groupCount = 0;
+
+        // Loop through nodes
+        for (int node = 0; node < numNodes; node++) {
+
+            // If node hasn't been visited, helper method for recursive dfs traveral, increment group count
+            if (!isVisited[node]) {
+                dfs(node, graph, isVisited);
+                groupCount++;
+            }
+        }
+
+        // Once all nodes have been visited, return total group count
+        return groupCount;
     }
 
+    private void dfs(int node, Map<Integer, List<Integer>> graph, boolean[] isVisited) {
+        
+        // Make sure current node has been visited
+        isVisited[node] = true;
+
+        // Loop through adjacent nodes, making sure loop works even when graph is disconnected
+        for (int adjacent : graph.getOrDefault(node, new ArrayList<>())) {
+
+            // If adjacent hasn't been visisted, recursively call dfs traversal
+            if (!isVisited[adjacent]) {
+                dfs(adjacent, graph, isVisited);
+            }
+        }
+    }
 }
